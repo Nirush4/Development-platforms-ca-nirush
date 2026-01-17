@@ -1,21 +1,57 @@
-import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Navbar } from './components/Navbar';
+import { Home } from './view/Home';
+import { Login } from './view/Login';
+import { Register } from './view/Register';
+import { CreateArticle } from './view/CreateArticle';
+import { EditArticle } from './view/EditArticle';
+import supabase from './lib/supabaseClient';
 
-const App: React.FC = () => {
-  const [count, setCount] = useState<number>(0);
+import { useEffect, useState } from 'react';
 
-  const increment = () => setCount((prev) => prev + 1);
-  const decrement = () => setCount((prev) => prev - 1);
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<unknown>(null);
 
-  return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1 className='text-red-500'>React TypeScript Counter</h1>
-      <p>Count: {count}</p>
-      <button onClick={decrement} style={{ marginRight: '10px' }}>
-        -
-      </button>
-      <button onClick={increment}>+</button>
-    </div>
-  );
+  useEffect(() => {
+    const fetchUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+      setLoading(false);
+    };
+    fetchUser();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <Navigate to='/login' />;
+  return children;
 };
 
-export default App;
+export const App = () => (
+  <BrowserRouter>
+    <Navbar />
+    <Routes>
+      <Route path='/' element={<Home />} />
+      <Route path='/login' element={<Login />} />
+      <Route path='/register' element={<Register />} />
+      <Route
+        path='/create'
+        element={
+          <ProtectedRoute>
+            <CreateArticle />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/edit/:id'
+        element={
+          <ProtectedRoute>
+            <EditArticle />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  </BrowserRouter>
+);
