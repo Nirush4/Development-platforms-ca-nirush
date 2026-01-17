@@ -1,9 +1,30 @@
+// types.ts
+export interface Author {
+  avatar_url?: string;
+  id: string;
+  username: string;
+  email: string;
+}
+
 export interface Article {
-  id: number;
+  id: string;
   title: string;
   body: string;
-  image_url?: string;
   category: string;
+  image_url?: string;
   created_at: string;
-  author_id: string;
+  user_id: string;
+  username: string;
+}
+
+// ✅ FIXED: profiles is NOT an array
+export interface ArticleFromDB {
+  id: string;
+  title: string;
+  body: string;
+  category: string;
+  image_url?: string;
+  created_at: string;
+  user_id: string;
+  profiles: Author | null;
 }
