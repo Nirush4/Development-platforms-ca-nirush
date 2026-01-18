@@ -8,7 +8,7 @@ import { Loading } from '../utils/Loading';
 
 interface Props {
   article: Article;
-  onDelete?: (id: string) => void; // ← new callback
+  onDelete?: (id: string) => void;
 }
 
 export const ArticleCard = ({ article, onDelete }: Props) => {
@@ -20,7 +20,11 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
     'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png';
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (!error) setUser(data.user ?? null);
+    };
+    fetchUser();
   }, []);
 
   const handleDelete = async () => {
@@ -44,9 +48,9 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
         alert(error.message);
       } else {
         alert('Article deleted successfully');
-        onDelete?.(article.id); // ← notify parent to remove it
+        onDelete?.(article.id);
       }
-    }, 1000);
+    }, 800);
   };
 
   return (
@@ -85,11 +89,11 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
           <div className='flex items-center gap-2 mb-4'>
             <img
               src={placeholderAvatar}
-              alt={article?.username ?? 'User'}
+              alt={article.username ?? 'User'}
               className='object-cover w-8 h-8 rounded-full'
             />
             <span className='text-sm font-medium text-gray-700'>
-              {article?.username ?? 'User'}
+              {article.username ?? 'User'}
             </span>
           </div>
 
@@ -105,7 +109,7 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
               Read more →
             </Link>
 
-            {user && user.id === article.user_id && (
+            {user?.id === article.user_id && (
               <div className='flex items-center gap-2'>
                 <Link
                   to={`/articles/${article.id}/edit`}

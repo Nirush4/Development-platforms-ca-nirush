@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
-import { User } from '@supabase/supabase-js';
+import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { Loading } from '../utils/Loading';
 
 export const Navbar = () => {
@@ -9,14 +9,17 @@ export const Navbar = () => {
   const [loading, setLoading] = useState(false); // loading state for logout
 
   useEffect(() => {
-    // Get current user
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user ?? null);
-    });
+    // Fetch current user safely
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (!error) setUser(data.user ?? null);
+    };
+
+    fetchUser();
 
     // Listen to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (_event: AuthChangeEvent, session: Session | null) => {
         setUser(session?.user ?? null);
       }
     );
@@ -42,6 +45,7 @@ export const Navbar = () => {
     user?.user_metadata?.name ||
     user?.email ||
     'User';
+
   const avatar =
     localStorage.getItem('avatar_url') ||
     user?.user_metadata?.avatar_url ||
