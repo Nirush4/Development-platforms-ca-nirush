@@ -44,7 +44,52 @@ export const CreateArticle = () => {
   return (
     <>
       {loading && <Loading message='Creating article…' />}
-      <ArticleForm onSubmit={handleSubmit} />
+
+      <div className='flex justify-center min-h-screen px-4 py-10 pt-32 sm:px-6 lg:px-8'>
+        <div className='w-full max-w-2xl'>
+          {/* Go Back Button */}
+          <div className='mb-10'>
+            <button
+              onClick={() => navigate('/')}
+              className='flex items-center gap-2 font-medium text-gray-700 transition hover:text-blue-600'
+            >
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                className='w-5 h-5'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke='currentColor'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M15 19l-7-7 7-7'
+                />
+              </svg>
+              Go Back
+            </button>
+          </div>
+
+          {/* Form Card */}
+          <div className='overflow-hidden bg-white shadow-md rounded-xl'>
+            {/* Header */}
+            <div className='p-4 bg-blue-600 sm:p-6'>
+              <h1 className='text-lg font-bold text-white sm:text-2xl'>
+                Create a New Article
+              </h1>
+              <p className='mt-1 text-sm text-blue-100 sm:text-base'>
+                Fill out the form to publish your article.
+              </p>
+            </div>
+
+            {/* Form Content */}
+            <div className='p-4 sm:p-6'>
+              <ArticleForm onSubmit={handleSubmit} />
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

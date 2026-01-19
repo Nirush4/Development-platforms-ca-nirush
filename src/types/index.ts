@@ -15,9 +15,9 @@ export interface Article {
   created_at: string;
   user_id: string;
   username: string;
+  avatar_url?: string;
 }
 
-// ✅ FIXED: profiles is NOT an array
 export interface ArticleFromDB {
   id: string;
   title: string;

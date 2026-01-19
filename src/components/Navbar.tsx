@@ -6,18 +6,15 @@ import { Loading } from '../utils/Loading';
 
 export const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false); // loading state for logout
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch current user safely
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (!error) setUser(data.user ?? null);
     };
-
     fetchUser();
 
-    // Listen to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event: AuthChangeEvent, session: Session | null) => {
         setUser(session?.user ?? null);
@@ -31,7 +28,6 @@ export const Navbar = () => {
 
   const handleLogout = async () => {
     setLoading(true);
-
     setTimeout(async () => {
       await supabase.auth.signOut();
       localStorage.removeItem('username');
@@ -54,15 +50,23 @@ export const Navbar = () => {
   return (
     <>
       {loading && <Loading message='Logging out…' />}
-      <nav className='fixed top-0 z-50 w-full bg-white border-b'>
-        <div className='flex items-center justify-between max-w-6xl px-4 py-4 mx-auto'>
+
+      <nav className='fixed top-0 z-50 w-full px-4 bg-white border-b shadow-md sm:px-10'>
+        <div className='flex items-center justify-between max-w-6xl py-4 mx-auto'>
           {/* Logo */}
-          <Link to='/' className='text-xl font-bold'>
-            NewsApp
+          <Link
+            to='/'
+            className='font-serif text-2xl font-bold text-gray-900 transition hover:text-blue-600'
+          >
+            NewsHub
           </Link>
 
+          {/* Navigation Links */}
           <div className='flex items-center gap-6'>
-            <Link to='/' className='hover:text-blue-600'>
+            <Link
+              to='/'
+              className='font-medium text-gray-700 transition hover:text-blue-600'
+            >
               Home
             </Link>
 
@@ -70,40 +74,51 @@ export const Navbar = () => {
               <>
                 <Link
                   to='/articles/new'
-                  className='font-medium hover:text-blue-600'
+                  className='font-medium text-gray-700 transition hover:text-blue-600'
                 >
                   New Article
                 </Link>
 
                 <Link
                   to='/my-articles'
-                  className='font-medium hover:text-blue-600'
+                  className='font-medium text-gray-700 transition hover:text-blue-600'
                 >
                   My Articles
                 </Link>
 
-                <div className='flex items-center gap-2'>
+                {/* User Info */}
+                <div className='flex items-center gap-2 pl-4 border-l border-gray-300'>
                   <img
                     src={avatar}
                     alt='avatar'
                     className='object-cover w-8 h-8 rounded-full'
                   />
-                  <span className='text-sm font-medium'>{username}</span>
+                  <span className='font-medium text-gray-800'>{username}</span>
                 </div>
 
+                {/* Prominent Logout Button */}
                 <button
                   onClick={handleLogout}
-                  className='text-sm text-red-500 hover:underline'
+                  className='px-4 py-2 text-sm font-medium text-white transition duration-200 bg-red-600 rounded-lg shadow-sm hover:bg-red-700'
                 >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link to='/login' className='hover:text-blue-600'>
+                {/* Prominent Login Button */}
+                <Link
+                  to='/login'
+                  className='px-4 py-2 text-sm font-medium text-white transition duration-200 bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700'
+                >
                   Login
                 </Link>
-                <Link to='/register' className='hover:text-blue-600'>
+
+                {/* Subtle Register Link */}
+                <Link
+                  to='/register'
+                  className='ml-2 font-medium text-gray-700 transition hover:text-blue-600'
+                >
                   Register
                 </Link>
               </>
