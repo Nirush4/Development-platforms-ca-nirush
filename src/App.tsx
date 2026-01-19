@@ -1,20 +1,34 @@
-import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Navbar } from './components/Navbar';
 
-const App: React.FC = () => {
-  const [count, setCount] = useState<number>(0);
+// Views
+import { Home } from './view/Home';
+import { Login } from './view/Login';
+import { Register } from './view/Register';
+import { CreateArticle } from './view/CreateArticle';
+import { EditArticle } from './view/EditArticle';
+import { Footer } from './components/Footer';
 
-  const increment = () => setCount((prev) => prev + 1);
-  const decrement = () => setCount((prev) => prev - 1);
-
+const App = () => {
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1 className='text-red-500'>React TypeScript Counter</h1>
-      <p>Count: {count}</p>
-      <button onClick={decrement} style={{ marginRight: '10px' }}>
-        -
-      </button>
-      <button onClick={increment}>+</button>
-    </div>
+    <BrowserRouter>
+      <Navbar />
+
+      <main className=''>
+        <Routes>
+          {/* Public */}
+          <Route path='/' element={<Home />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+
+          {/* Authenticated */}
+          <Route path='/articles/new' element={<CreateArticle />} />
+          <Route path='/articles/:id/edit' element={<EditArticle />} />
+        </Routes>
+      </main>
+
+      <Footer />
+    </BrowserRouter>
   );
 };
 
