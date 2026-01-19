@@ -16,9 +16,6 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
 
-  const placeholderAvatar =
-    'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png';
-
   useEffect(() => {
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getUser();
@@ -88,10 +85,14 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
 
           <div className='flex items-center gap-2 mb-4'>
             <img
-              src={placeholderAvatar}
-              alt={article.username ?? 'User'}
+              src={
+                article.avatar_url ||
+                'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'
+              }
+              alt={article.username}
               className='object-cover w-8 h-8 rounded-full'
             />
+
             <span className='text-sm font-medium text-gray-700'>
               {article.username ?? 'User'}
             </span>

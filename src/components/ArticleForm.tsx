@@ -27,21 +27,21 @@ export const ArticleForm = ({ initialData = {}, onSubmit }: Props) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className='max-w-md p-4 mx-auto mt-40 bg-white rounded shadow'
+      className='max-w-md p-4 mx-auto bg-white rounded shadow'
     >
       <input
         type='text'
         placeholder='Title'
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        className='w-full p-2 mb-2 border rounded'
+        className='w-full p-2 mb-2 text-base border rounded'
         required
       />
       <textarea
         placeholder='Body'
         value={body}
         onChange={(e) => setBody(e.target.value)}
-        className='w-full p-2 mb-2 border rounded'
+        className='w-full p-2 mb-2 text-base border rounded'
         rows={5}
         required
       />
@@ -50,14 +50,14 @@ export const ArticleForm = ({ initialData = {}, onSubmit }: Props) => {
         placeholder='Image URL (optional)'
         value={imageUrl}
         onChange={(e) => setImageUrl(e.target.value)}
-        className='w-full p-2 mb-2 border rounded'
+        className='w-full p-2 mb-2 text-base border rounded'
       />
       <input
         type='text'
         placeholder='Category'
         value={category}
         onChange={(e) => setCategory(e.target.value)}
-        className='w-full p-2 mb-2 border rounded'
+        className='w-full p-2 mb-2 text-base border rounded'
         required
       />
       <button
