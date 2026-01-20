@@ -103,7 +103,11 @@ export const EditArticle = () => {
             {/* Form Content */}
             <div className='p-4 sm:p-6'>
               {article ? (
-                <ArticleForm initialData={article} onSubmit={handleSubmit} />
+                <ArticleForm
+                  initialData={article}
+                  onSubmit={handleSubmit}
+                  onCancel={() => navigate('/')} // go back without saving
+                />
               ) : (
                 !loading && (
                   <p className='mt-6 text-center text-gray-500'>

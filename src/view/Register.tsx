@@ -59,7 +59,7 @@ export const Register = () => {
       setTimeout(() => {
         setShowLoader(false);
         alert('Check your email to confirm your registration.');
-        navigate('/login');
+        navigate('/');
       }, 1000);
     } catch (err) {
       console.error('Unexpected error during registration:', err);
