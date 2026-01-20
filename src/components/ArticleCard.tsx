@@ -114,7 +114,7 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
               <div className='flex items-center gap-2'>
                 <Link
                   to={`/articles/${article.id}/edit`}
-                  className='inline-flex items-center gap-1 px-2 py-1 text-sm text-gray-600 rounded-md hover:bg-gray-100 hover:text-gray-900'
+                  className='inline-flex items-center gap-1 px-2 py-1 text-sm text-gray-600 rounded-md hover:bg-gray-200 hover:text-gray-900'
                 >
                   <Pencil size={16} />
                   Edit

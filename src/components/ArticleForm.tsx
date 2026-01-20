@@ -9,9 +9,14 @@ interface Props {
     category: string;
     image_url?: string;
   }) => void;
+  onCancel?: () => void; // ✅ optional cancel callback
 }
 
-export const ArticleForm = ({ initialData = {}, onSubmit }: Props) => {
+export const ArticleForm = ({
+  initialData = {},
+  onSubmit,
+  onCancel,
+}: Props) => {
   const [title, setTitle] = useState(initialData.title || '');
   const [body, setBody] = useState(initialData.body || '');
   const [category, setCategory] = useState(initialData.category || '');
@@ -19,8 +24,9 @@ export const ArticleForm = ({ initialData = {}, onSubmit }: Props) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !body || !category)
+    if (!title || !body || !category) {
       return alert('Please fill all required fields');
+    }
     onSubmit({ title, body, category, image_url: imageUrl || undefined });
   };
 
@@ -60,12 +66,25 @@ export const ArticleForm = ({ initialData = {}, onSubmit }: Props) => {
         className='w-full p-2 mb-2 text-base border rounded'
         required
       />
-      <button
-        type='submit'
-        className='w-full p-2 text-white bg-blue-500 rounded'
-      >
-        Submit
-      </button>
+
+      {/* Buttons */}
+      <div className='flex gap-2 mt-2'>
+        {onCancel && (
+          <button
+            type='button'
+            onClick={onCancel}
+            className='flex-1 p-2 text-sm text-gray-700 bg-gray-200 rounded sm:text-base hover:bg-gray-300'
+          >
+            Cancel
+          </button>
+        )}
+        <button
+          type='submit'
+          className='flex-1 p-2 text-sm text-white bg-blue-500 rounded sm:text-base hover:bg-blue-600'
+        >
+          Submit
+        </button>
+      </div>
     </form>
   );
 };

@@ -2,8 +2,60 @@ import { useEffect, useState } from 'react';
 import supabase from '../lib/supabaseClient';
 import { Article, ArticleFromDB } from '../types';
 import { ArticleCard } from '../components/ArticleCard';
-import { Loading } from '../utils/Loading';
 import { useNavigate } from 'react-router-dom';
+
+/* =======================
+   Skeleton Components
+======================= */
+
+const HeroSkeleton = () => (
+  <section className='relative flex items-center w-full h-[90vh] bg-gray-300 animate-pulse'>
+    <div className='absolute inset-0 bg-black/30'></div>
+    <div className='relative max-w-6xl px-4 mx-auto text-center sm:px-6 lg:px-8'>
+      <div className='w-32 h-6 mx-auto mb-4 bg-gray-400 rounded' />
+      <div className='w-3/4 h-10 mx-auto mb-4 bg-gray-400 rounded' />
+      <div className='w-2/3 h-5 mx-auto mb-6 bg-gray-400 rounded' />
+      <div className='w-40 h-10 mx-auto bg-gray-400 rounded' />
+    </div>
+  </section>
+);
+
+const ArticleCardSkeleton = () => (
+  <div className='overflow-hidden bg-white shadow rounded-xl animate-pulse'>
+    <div className='w-full h-48 bg-gray-300' />
+    <div className='p-4 space-y-3'>
+      <div className='w-20 h-3 bg-gray-300 rounded' />
+      <div className='w-full h-4 bg-gray-300 rounded' />
+      <div className='w-5/6 h-3 bg-gray-300 rounded' />
+      <div className='w-24 h-8 mt-4 bg-gray-300 rounded' />
+    </div>
+  </div>
+);
+
+const GridSkeleton = ({ count = 6 }: { count?: number }) => (
+  <section className='relative z-10 px-4 mx-auto -mt-[5rem] max-w-7xl sm:px-6 lg:px-8'>
+    <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+      {Array.from({ length: count }).map((_, i) => (
+        <ArticleCardSkeleton key={i} />
+      ))}
+    </div>
+  </section>
+);
+
+const TopStoriesSkeleton = () => (
+  <section className='px-4 mx-auto mt-16 max-w-7xl sm:px-6 lg:px-8'>
+    <div className='w-40 h-6 mb-6 bg-gray-300 rounded animate-pulse' />
+    <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4'>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <ArticleCardSkeleton key={i} />
+      ))}
+    </div>
+  </section>
+);
+
+/* =======================
+   Home Component
+======================= */
 
 export const Home = () => {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -16,26 +68,23 @@ export const Home = () => {
         .from('articles')
         .select(
           `
-        id,
-        title,
-        body,
-        category,
-        image_url,
-        created_at,
-        user_id,
-        profiles!inner (
           id,
-          username,
-          email,
-          avatar_url
-        )
-      `
+          title,
+          body,
+          category,
+          image_url,
+          created_at,
+          user_id,
+          profiles!inner (
+            id,
+            username,
+            avatar_url
+          )
+        `
         )
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching articles:', error.message);
-      } else if (data) {
+      if (!error && data) {
         const mappedArticles: Article[] = (
           data as unknown as ArticleFromDB[]
         ).map((item) => ({
@@ -43,10 +92,7 @@ export const Home = () => {
           title: item.title,
           body: item.body,
           category: item.category,
-          image_url:
-            item.image_url && item.image_url.trim() !== ''
-              ? item.image_url
-              : undefined,
+          image_url: item.image_url || undefined,
           created_at: item.created_at,
           user_id: item.user_id,
           username: item.profiles?.username ?? 'Unknown Author',
@@ -64,67 +110,79 @@ export const Home = () => {
     fetchArticles();
   }, []);
 
-  const handleArticleDelete = (id: string) => {
-    setArticles((prev) => prev.filter((article) => article.id !== id));
-  };
+  /* =======================
+     Skeleton View
+  ======================= */
+  if (loading) {
+    return (
+      <div className='w-full bg-gray-50'>
+        <HeroSkeleton />
+        <GridSkeleton />
+        <TopStoriesSkeleton />
+      </div>
+    );
+  }
 
-  if (loading) return <Loading message='Loading articles…' />;
-
-  if (!articles.length)
+  if (!articles.length) {
     return (
       <p className='mt-40 text-xl text-center text-gray-500'>
         No articles found.
       </p>
     );
+  }
 
-  // Take the most recent article for the cover
   const [featured, ...otherArticles] = articles;
-  console.log(featured);
+  const topStories = [...otherArticles]
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 4);
+
   return (
-    <div className='w-full'>
-      {/* Cover Section */}
+    <div className='w-full mt-10 bg-gray-50'>
       <section
-        className='relative flex items-center w-full h-screen text-white bg-gray-900'
+        className='relative flex items-center w-full text-white h-dvh'
         style={{
-          backgroundImage: `url(${
-            featured.image_url ||
-            'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'
-          })`,
+          backgroundImage: `url(${featured.image_url})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        <div className='absolute inset-0 bg-black/40'></div>
-        <div className='relative max-w-5xl px-4 mx-auto text-center sm:px-6 lg:px-8'>
-          <span className='inline-block px-3 py-1 mb-4 text-xs font-semibold uppercase bg-blue-600 rounded sm:text-sm'>
+        <div className='absolute inset-0 bg-black/60'></div>
+        <div className='relative max-w-6xl px-4 mx-auto text-center sm:px-6 lg:px-8'>
+          <span className='inline-block px-3 py-1 mb-4 text-xs font-semibold uppercase bg-blue-600 rounded'>
             {featured.category}
           </span>
-          <h1 className='mb-4 text-xl font-bold sm:text-3xl lg:text-5xl'>
+          <h1 className='mb-4 text-2xl font-bold sm:text-4xl lg:text-6xl'>
             {featured.title}
           </h1>
-          <p className='max-w-3xl mx-auto mb-6 text-lg leading-relaxed sm:text-xl'>
-            {featured.body.length > 200
-              ? featured.body.slice(0, 200) + '...'
-              : featured.body}
+          <p className='max-w-3xl mx-auto mb-[3rem] text-lg sm:text-xl'>
+            {featured.body.slice(0, 250)}...
           </p>
           <button
             onClick={() => navigate(`/article/${featured.id}`)}
-            className='px-4 py-2 text-sm font-semibold text-white transition bg-blue-600 rounded sm:text-lg sm:px-6 sm:py-3 hover:bg-blue-700'
+            className='px-6 py-2 text-lg font-semibold bg-blue-600 rounded hover:bg-blue-700'
           >
             Read Full Article
           </button>
         </div>
       </section>
 
-      {/* Other Articles Grid */}
-      <section className='relative z-10 grid max-w-6xl grid-cols-1 gap-6 px-4 mx-auto -mt-32 sm:px-6 lg:px-8 sm:grid-cols-2 lg:grid-cols-3'>
-        {otherArticles.map((article) => (
-          <ArticleCard
-            key={article.id}
-            article={article}
-            onDelete={handleArticleDelete}
-          />
-        ))}
+      <section className='relative z-10 px-4 mx-auto  -mt-[9rem] max-w-6xl sm:px-6 lg:px-8'>
+        <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+          {otherArticles.map((article) => (
+            <ArticleCard key={article.id} article={article} />
+          ))}
+        </div>
+      </section>
+
+      <section className='px-4 mx-auto mt-16 max-w-7xl sm:px-6 lg:px-8'>
+        <h3 className='mb-4 text-xl font-bold text-gray-900 sm:text-2xl'>
+          Top Stories
+        </h3>
+        <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4'>
+          {topStories.map((story) => (
+            <ArticleCard key={story.id} article={story} />
+          ))}
+        </div>
       </section>
     </div>
   );

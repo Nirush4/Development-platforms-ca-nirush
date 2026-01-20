@@ -9,6 +9,7 @@ import { Register } from './view/Register';
 import { CreateArticle } from './view/CreateArticle';
 import { EditArticle } from './view/EditArticle';
 import { SingleArticle } from './view/SingleArticle';
+import { MyArticles } from './view/MyArticles'; // ✅ import the new page
 import { Footer } from './components/Footer';
 
 const App = () => {
@@ -24,6 +25,8 @@ const App = () => {
           <Route path='/articles/new' element={<CreateArticle />} />
           <Route path='/articles/:id/edit' element={<EditArticle />} />
           <Route path='/article/:id' element={<SingleArticle />} />
+          <Route path='/my-articles' element={<MyArticles />} />{' '}
+          {/* ✅ new route */}
         </Routes>
       </main>
       <Footer />

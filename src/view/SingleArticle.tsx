@@ -131,7 +131,7 @@ export const SingleArticle = () => {
         </div>
       </div>
 
-      <p className='mb-6 text-sm leading-relaxed text-gray-700 whitespace-pre-line sm:text-xl'>
+      <p className='mb-6 text-sm leading-relaxed text-gray-700 whitespace-pre-line sm:text-base'>
         {article.body}
       </p>
 
@@ -140,7 +140,7 @@ export const SingleArticle = () => {
         <div className='flex gap-3 mt-6'>
           <Link
             to={`/articles/${article.id}/edit`}
-            className='inline-flex items-center gap-1 px-4 py-2 text-gray-800 transition bg-gray-100 rounded-md hover:bg-gray-200'
+            className='inline-flex items-center gap-1 px-4 py-2 text-gray-800 transition bg-gray-300 rounded-md hover:bg-gray-400'
           >
             <Pencil size={16} /> Edit
           </Link>

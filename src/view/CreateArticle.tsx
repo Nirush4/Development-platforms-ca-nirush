@@ -85,7 +85,10 @@ export const CreateArticle = () => {
 
             {/* Form Content */}
             <div className='p-4 sm:p-6'>
-              <ArticleForm onSubmit={handleSubmit} />
+              <ArticleForm
+                onSubmit={handleSubmit}
+                onCancel={() => navigate('/')} // ✅ Cancel button
+              />
             </div>
           </div>
         </div>

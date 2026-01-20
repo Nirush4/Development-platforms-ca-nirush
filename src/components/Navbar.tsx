@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { Loading } from '../utils/Loading';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 
 export const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (!error) setUser(data.user ?? null);
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user ?? null);
     };
     fetchUser();
 
@@ -30,10 +34,10 @@ export const Navbar = () => {
     setLoading(true);
     setTimeout(async () => {
       await supabase.auth.signOut();
-      localStorage.removeItem('username');
-      localStorage.removeItem('avatar_url');
+      localStorage.clear();
       setLoading(false);
-    }, 1000);
+      setIsOpen(false);
+    }, 800);
   };
 
   const username =
@@ -47,6 +51,16 @@ export const Navbar = () => {
     user?.user_metadata?.avatar_url ||
     'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png';
 
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    ...(user
+      ? [
+          { name: 'New Article', path: '/articles/new' },
+          { name: 'My Articles', path: '/my-articles' },
+        ]
+      : []),
+  ];
+
   return (
     <>
       {loading && <Loading message='Logging out…' />}
@@ -54,77 +68,151 @@ export const Navbar = () => {
       <nav className='fixed top-0 z-50 w-full px-4 bg-red-600 shadow-md sm:px-10'>
         <div className='flex items-center justify-between max-w-6xl py-4 mx-auto'>
           {/* Logo */}
-          <Link
-            to='/'
-            className='font-serif text-2xl font-bold text-gray-100 transition hover:text-yellow-500'
-          >
+          <Link to='/' className='font-serif text-2xl font-bold text-gray-100'>
             NewsHub
           </Link>
 
-          {/* Navigation Links */}
-          <div className='flex items-center gap-6'>
-            <Link
-              to='/'
-              className='font-medium text-gray-100 transition hover:text-yellow-500'
-            >
-              Home
-            </Link>
+          {/* Desktop Navigation */}
+          <div className='items-center hidden gap-6 md:flex'>
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+
+              return (
+                <motion.div
+                  key={link.path}
+                  className='relative'
+                  initial='rest'
+                  whileHover='hover'
+                  animate={isActive ? 'hover' : 'rest'}
+                >
+                  <Link
+                    to={link.path}
+                    className={`font-medium transition-colors ${
+                      isActive
+                        ? 'text-yellow-400'
+                        : 'text-gray-100 hover:text-yellow-400'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+
+                  <motion.span
+                    variants={{
+                      rest: { scaleX: 0, opacity: 0 },
+                      hover: { scaleX: 1, opacity: 1 },
+                    }}
+                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    className='absolute left-0 right-0 -bottom-1 h-[3px] bg-yellow-400 rounded-full origin-center'
+                  />
+                </motion.div>
+              );
+            })}
 
             {user ? (
               <>
-                <Link
-                  to='/articles/new'
-                  className='font-medium text-gray-100 transition hover:text-yellow-500'
-                >
-                  New Article
-                </Link>
-
-                <Link
-                  to='/my-articles'
-                  className='font-medium text-gray-100 transition hover:text-yellow-500'
-                >
-                  My Articles
-                </Link>
-
-                {/* User Info */}
-                <div className='flex items-center gap-2 pl-4 border-l border-gray-300'>
+                <div className='flex items-center gap-2 pl-4 border-l border-red-400'>
                   <img
                     src={avatar}
                     alt='avatar'
                     className='object-cover w-8 h-8 rounded-full'
                   />
-                  <span className='font-medium text-gray-100'>{username}</span>
+                  <span className='text-gray-100'>{username}</span>
                 </div>
 
-                {/* Prominent Logout Button */}
                 <button
                   onClick={handleLogout}
-                  className='px-4 py-2 text-sm font-medium text-black transition duration-200 bg-white rounded-lg shadow-sm hover:bg-gray-200'
+                  className='px-4 py-2 text-sm bg-white rounded-lg'
                 >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                {/* Prominent Login Button */}
                 <Link
                   to='/login'
-                  className='px-4 py-2 text-sm font-medium text-black transition duration-200 bg-white rounded-lg shadow-sm hover:bg-gray-200'
+                  className='px-4 py-2 text-sm bg-white rounded-lg'
                 >
                   Login
                 </Link>
-
-                {/* Subtle Register Link */}
                 <Link
                   to='/register'
-                  className='ml-2 font-medium text-gray-100 transition hover:text-yellow-500'
+                  className='text-gray-100 hover:text-yellow-400'
                 >
                   Register
                 </Link>
               </>
             )}
           </div>
+
+          {/* Hamburger Button */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className='text-white md:hidden'
+          >
+            {isOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className='px-4 pb-4 md:hidden'
+            >
+              <div className='flex flex-col gap-4 pt-4 border-t border-red-500'>
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setIsOpen(false)}
+                    className='font-medium text-gray-100 hover:text-yellow-400'
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+
+                {user ? (
+                  <>
+                    <div className='flex items-center gap-2 pt-2 border-t border-red-500'>
+                      <img
+                        src={avatar}
+                        className='w-8 h-8 rounded-full'
+                        alt='avatar'
+                      />
+                      <span className='text-gray-100'>{username}</span>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className='px-4 py-2 text-sm bg-white rounded-lg'
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to='/login'
+                      onClick={() => setIsOpen(false)}
+                      className='px-4 py-2 text-sm bg-white rounded-lg'
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to='/register'
+                      onClick={() => setIsOpen(false)}
+                      className='text-gray-100 hover:text-yellow-400'
+                    >
+                      Register
+                    </Link>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </>
   );
