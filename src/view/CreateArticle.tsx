@@ -51,7 +51,7 @@ export const CreateArticle = () => {
           <div className='mb-10'>
             <button
               onClick={() => navigate('/')}
-              className='flex items-center gap-2 font-medium text-gray-700 transition hover:text-blue-600'
+              className='flex items-center gap-2 text-sm font-medium text-gray-700 transition sm:text-base hover:text-blue-600'
             >
               <svg
                 xmlns='http://www.w3.org/2000/svg'

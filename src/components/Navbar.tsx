@@ -51,12 +51,12 @@ export const Navbar = () => {
     <>
       {loading && <Loading message='Logging out…' />}
 
-      <nav className='fixed top-0 z-50 w-full px-4 bg-white border-b shadow-md sm:px-10'>
+      <nav className='fixed top-0 z-50 w-full px-4 bg-red-600 shadow-md sm:px-10'>
         <div className='flex items-center justify-between max-w-6xl py-4 mx-auto'>
           {/* Logo */}
           <Link
             to='/'
-            className='font-serif text-2xl font-bold text-gray-900 transition hover:text-blue-600'
+            className='font-serif text-2xl font-bold text-gray-100 transition hover:text-yellow-500'
           >
             NewsHub
           </Link>
@@ -65,7 +65,7 @@ export const Navbar = () => {
           <div className='flex items-center gap-6'>
             <Link
               to='/'
-              className='font-medium text-gray-700 transition hover:text-blue-600'
+              className='font-medium text-gray-100 transition hover:text-yellow-500'
             >
               Home
             </Link>
@@ -74,14 +74,14 @@ export const Navbar = () => {
               <>
                 <Link
                   to='/articles/new'
-                  className='font-medium text-gray-700 transition hover:text-blue-600'
+                  className='font-medium text-gray-100 transition hover:text-yellow-500'
                 >
                   New Article
                 </Link>
 
                 <Link
                   to='/my-articles'
-                  className='font-medium text-gray-700 transition hover:text-blue-600'
+                  className='font-medium text-gray-100 transition hover:text-yellow-500'
                 >
                   My Articles
                 </Link>
@@ -93,13 +93,13 @@ export const Navbar = () => {
                     alt='avatar'
                     className='object-cover w-8 h-8 rounded-full'
                   />
-                  <span className='font-medium text-gray-800'>{username}</span>
+                  <span className='font-medium text-gray-100'>{username}</span>
                 </div>
 
                 {/* Prominent Logout Button */}
                 <button
                   onClick={handleLogout}
-                  className='px-4 py-2 text-sm font-medium text-white transition duration-200 bg-red-600 rounded-lg shadow-sm hover:bg-red-700'
+                  className='px-4 py-2 text-sm font-medium text-black transition duration-200 bg-white rounded-lg shadow-sm hover:bg-gray-200'
                 >
                   Logout
                 </button>
@@ -109,7 +109,7 @@ export const Navbar = () => {
                 {/* Prominent Login Button */}
                 <Link
                   to='/login'
-                  className='px-4 py-2 text-sm font-medium text-white transition duration-200 bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700'
+                  className='px-4 py-2 text-sm font-medium text-black transition duration-200 bg-white rounded-lg shadow-sm hover:bg-gray-200'
                 >
                   Login
                 </Link>
@@ -117,7 +117,7 @@ export const Navbar = () => {
                 {/* Subtle Register Link */}
                 <Link
                   to='/register'
-                  className='ml-2 font-medium text-gray-700 transition hover:text-blue-600'
+                  className='ml-2 font-medium text-gray-100 transition hover:text-yellow-500'
                 >
                   Register
                 </Link>
