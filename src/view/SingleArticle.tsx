@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { Article } from '../types';
-import { Loading } from '../utils/Loading';
 import { User } from '@supabase/supabase-js';
 import { Pencil, Trash2 } from 'lucide-react';
+import { SingleArticleSkeleton } from '../components/SingleArticleSkeleton';
 
 export const SingleArticle = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [article, setArticle] = useState<Article | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
@@ -23,9 +23,12 @@ export const SingleArticle = () => {
         .select('*')
         .eq('id', id)
         .single();
+      if (error) {
+        alert(error.message);
+      } else {
+        setArticle(data);
+      }
       setLoading(false);
-      if (error) return alert(error.message);
-      setArticle(data);
     };
 
     const fetchUser = async () => {
@@ -55,7 +58,8 @@ export const SingleArticle = () => {
     }, 800);
   };
 
-  if (loading) return <Loading message='Loading article…' />;
+  // Show skeleton while loading
+  if (loading) return <SingleArticleSkeleton />;
 
   if (!article) {
     return (
@@ -66,7 +70,7 @@ export const SingleArticle = () => {
   }
 
   return (
-    <div className='max-w-4xl px-4 mx-auto mt-28 sm:px-6'>
+    <div className='max-w-4xl px-4 mx-auto mb-10 mt-28 sm:mb-20 sm:px-6'>
       {/* Go Back Button */}
       <button
         onClick={() => navigate('/')}
@@ -140,14 +144,14 @@ export const SingleArticle = () => {
         <div className='flex gap-3 mt-6'>
           <Link
             to={`/articles/${article.id}/edit`}
-            className='inline-flex items-center gap-1 px-4 py-2 text-gray-800 transition bg-gray-300 rounded-md hover:bg-gray-400'
+            className='inline-flex items-center gap-1 px-4 py-2 text-sm text-gray-800 transition bg-gray-300 rounded-md sm:text-base hover:bg-gray-400'
           >
             <Pencil size={16} /> Edit
           </Link>
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className='inline-flex items-center gap-1 px-4 py-2 text-white transition bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50'
+            className='inline-flex items-center gap-1 px-4 py-2 text-sm text-white transition bg-red-600 rounded-md sm:text-base hover:bg-red-700 disabled:opacity-50'
           >
             <Trash2 size={16} />
             {isDeleting ? 'Deleting…' : 'Delete'}

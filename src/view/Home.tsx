@@ -159,7 +159,7 @@ export const Home = () => {
           </p>
           <button
             onClick={() => navigate(`/article/${featured.id}`)}
-            className='px-6 py-2 text-lg font-semibold bg-blue-600 rounded hover:bg-blue-700'
+            className='px-6 py-2 text-lg font-semibold bg-blue-600 rounded sm:rounded-lg hover:bg-blue-700'
           >
             Read Full Article
           </button>
