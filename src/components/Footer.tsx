@@ -2,7 +2,7 @@ import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 
 export const Footer = () => {
   return (
-    <footer className='mt-20 border-t border-slate-700 bg-slate-900'>
+    <footer className='border-t border-slate-700 bg-slate-900'>
       {/* Main Content */}
       <div className='grid max-w-6xl gap-8 px-4 py-12 mx-auto sm:px-10 md:grid-cols-4'>
         {/* About Section */}
