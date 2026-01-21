@@ -71,7 +71,7 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
 
         {/* Content */}
         <div className='flex flex-col flex-1 p-6'>
-          <time className='mb-2 text-xs text-gray-400'>
+          <time className='mb-2 text-xs text-gray-400 sm:text-sm'>
             {new Date(article.created_at).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',

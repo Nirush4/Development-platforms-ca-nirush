@@ -9,6 +9,7 @@ import { SingleArticleSkeleton } from '../components/SingleArticleSkeleton';
 export const SingleArticle = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
   const [article, setArticle] = useState<Article | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -18,16 +19,32 @@ export const SingleArticle = () => {
     const fetchArticle = async () => {
       if (!id) return;
       setLoading(true);
+
       const { data, error } = await supabase
         .from('articles')
-        .select('*')
+        .select(
+          `
+          *,
+          profiles (
+            username,
+            avatar_url
+          )
+        `
+        )
         .eq('id', id)
         .single();
+
       if (error) {
         alert(error.message);
-      } else {
-        setArticle(data);
+      } else if (data) {
+        // ✅ FLATTEN joined profile data
+        setArticle({
+          ...data,
+          username: data.profiles?.username,
+          avatar_url: data.profiles?.avatar_url,
+        });
       }
+
       setLoading(false);
     };
 
@@ -58,7 +75,7 @@ export const SingleArticle = () => {
     }, 800);
   };
 
-  // Show skeleton while loading
+  // Loading skeleton
   if (loading) return <SingleArticleSkeleton />;
 
   if (!article) {
@@ -107,25 +124,26 @@ export const SingleArticle = () => {
         </div>
       )}
 
-      {/* Article Content */}
+      {/* Article Title */}
       <h1 className='mb-4 text-lg font-bold text-gray-900 sm:text-4xl'>
         {article.title}
       </h1>
 
+      {/* Author */}
       <div className='flex items-center gap-3 mb-6'>
         <img
           src={
             article.avatar_url ||
             'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'
           }
-          alt={article.username}
+          alt={article.username ?? 'User'}
           className='object-cover w-10 h-10 rounded-full'
         />
         <div>
-          <p className='text-sm font-medium text-gray-700'>
+          <p className='text-sm font-medium text-gray-700 sm:text-base'>
             {article.username ?? 'User'}
           </p>
-          <time className='text-xs text-gray-400'>
+          <time className='text-xs text-gray-400 sm:text-sm'>
             {new Date(article.created_at).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
@@ -135,11 +153,12 @@ export const SingleArticle = () => {
         </div>
       </div>
 
+      {/* Body */}
       <p className='mb-6 text-sm leading-relaxed text-gray-700 whitespace-pre-line sm:text-base'>
         {article.body}
       </p>
 
-      {/* Edit/Delete for author */}
+      {/* Edit / Delete (Author only) */}
       {user?.id === article.user_id && (
         <div className='flex gap-3 mt-6'>
           <Link
@@ -148,6 +167,7 @@ export const SingleArticle = () => {
           >
             <Pencil size={16} /> Edit
           </Link>
+
           <button
             onClick={handleDelete}
             disabled={isDeleting}

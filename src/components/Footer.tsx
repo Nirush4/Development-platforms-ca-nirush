@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 
 export const Footer = () => {
@@ -18,19 +19,19 @@ export const Footer = () => {
           <h4 className='mb-2 font-semibold text-white'>Explore</h4>
           <ul className='space-y-1 text-sm text-gray-300'>
             <li>
-              <a href='/' className='transition-colors hover:text-blue-400'>
+              <Link to='/' className='transition-colors hover:text-blue-400'>
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a href='/' className='transition-colors hover:text-blue-400'>
+              <Link to='/' className='transition-colors hover:text-blue-400'>
                 Latest Articles
-              </a>
+              </Link>
             </li>
             <li>
-              <a href='/' className='transition-colors hover:text-blue-400'>
+              <Link to='/' className='transition-colors hover:text-blue-400'>
                 Categories
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -40,14 +41,14 @@ export const Footer = () => {
           <h4 className='mb-2 font-semibold text-white'>Legal</h4>
           <ul className='space-y-1 text-sm text-gray-300'>
             <li>
-              <a href='/' className='transition-colors hover:text-blue-400'>
+              <Link to='/' className='transition-colors hover:text-blue-400'>
                 Privacy Policy
-              </a>
+              </Link>
             </li>
             <li>
-              <a href='/' className='transition-colors hover:text-blue-400'>
+              <Link to='/' className='transition-colors hover:text-blue-400'>
                 Terms of Service
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
