@@ -159,7 +159,7 @@ export const Home = () => {
           </p>
           <button
             onClick={() => navigate(`/article/${featured.id}`)}
-            className='px-6 py-2 text-lg font-semibold bg-blue-600 rounded sm:rounded-lg hover:bg-blue-700'
+            className='px-6 py-2 mb-[10rem] text-lg font-semibold bg-blue-600 rounded sm:mb-0 sm:rounded-lg hover:bg-blue-700'
           >
             Read Full Article
           </button>
@@ -174,7 +174,7 @@ export const Home = () => {
         </div>
       </section>
 
-      <section className='px-4 mx-auto mt-16 max-w-7xl sm:px-6 lg:px-8'>
+      <section className='px-4 mx-auto mt-16 mb-10 sm:mb-20 max-w-7xl sm:px-6 lg:px-8'>
         <h3 className='mb-4 text-xl font-bold text-gray-900 sm:text-2xl'>
           Top Stories
         </h3>

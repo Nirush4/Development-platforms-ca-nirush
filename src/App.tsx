@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { ScrollToTop } from './utils/ScrollToTop';
+import { initCookieConsent } from './components/cookieConsentView';
 
 // Views
 import { Home } from './view/Home';
@@ -9,10 +11,14 @@ import { Register } from './view/Register';
 import { CreateArticle } from './view/CreateArticle';
 import { EditArticle } from './view/EditArticle';
 import { SingleArticle } from './view/SingleArticle';
-import { MyArticles } from './view/MyArticles'; // ✅ import the new page
+import { MyArticles } from './view/MyArticles';
 import { Footer } from './components/Footer';
 
 const App = () => {
+  useEffect(() => {
+    initCookieConsent();
+  }, []);
+
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -25,8 +31,7 @@ const App = () => {
           <Route path='/articles/new' element={<CreateArticle />} />
           <Route path='/articles/:id/edit' element={<EditArticle />} />
           <Route path='/article/:id' element={<SingleArticle />} />
-          <Route path='/my-articles' element={<MyArticles />} />{' '}
-          {/* ✅ new route */}
+          <Route path='/my-articles' element={<MyArticles />} />
         </Routes>
       </main>
       <Footer />
