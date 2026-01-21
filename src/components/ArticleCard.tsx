@@ -5,6 +5,8 @@ import { User } from '@supabase/supabase-js';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Article } from '../types';
 import { Loading } from '../utils/Loading';
+import { showConfirmModal } from '../utils/confirmModal';
+import { useSnackbar } from 'notistack';
 
 interface Props {
   article: Article;
@@ -15,6 +17,7 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
   const [user, setUser] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
+  const { enqueueSnackbar } = useSnackbar(); // ✅ toast
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,7 +28,9 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
   }, []);
 
   const handleDelete = async () => {
-    const confirmed = confirm('Delete this article permanently?');
+    const confirmed = await showConfirmModal(
+      'Are you sure you want to delete this article?'
+    );
     if (!confirmed) return;
 
     setIsDeleting(true);
@@ -36,25 +41,27 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
       .delete()
       .eq('id', article.id);
 
-    // Smooth UX with a small delay
+    // Smooth UX delay
     setTimeout(() => {
       setShowLoader(false);
       setIsDeleting(false);
 
       if (error) {
-        alert(error.message);
+        enqueueSnackbar(error.message, { variant: 'error' });
       } else {
-        alert('Article deleted successfully');
+        enqueueSnackbar('Article deleted successfully', {
+          variant: 'success',
+        });
         onDelete?.(article.id);
       }
-    }, 800);
+    }, 1000);
   };
 
   return (
     <>
       {showLoader && <Loading message='Deleting article…' />}
 
-      <article className='flex flex-col overflow-hidden transition bg-white border shadow-sm rounded-xl hover:shadow-lg'>
+      <article className='flex flex-col overflow-hidden transition bg-white shadow-sm rounded-xl hover:shadow-lg'>
         {/* Article Image */}
         {article.image_url && (
           <div className='relative overflow-hidden h-52'>
@@ -92,7 +99,6 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
               alt={article.username}
               className='object-cover w-8 h-8 rounded-full'
             />
-
             <span className='text-sm font-medium text-gray-700'>
               {article.username ?? 'User'}
             </span>

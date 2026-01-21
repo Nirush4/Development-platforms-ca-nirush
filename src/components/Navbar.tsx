@@ -5,12 +5,14 @@ import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { Loading } from '../utils/Loading';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { useSnackbar } from 'notistack';
 
 export const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -30,14 +32,26 @@ export const Navbar = () => {
     };
   }, []);
 
+  // 🔥 Updated logout handler with page reload
   const handleLogout = async () => {
     setLoading(true);
     setTimeout(async () => {
-      await supabase.auth.signOut();
-      localStorage.clear();
-      setLoading(false);
-      setIsOpen(false);
-    }, 800);
+      try {
+        await supabase.auth.signOut();
+        localStorage.clear();
+        setIsOpen(false);
+        enqueueSnackbar('Logged out successfully', { variant: 'info' });
+      } catch (error) {
+        enqueueSnackbar('Logout failed. Please try again.', {
+          variant: 'error',
+        });
+        console.error('Logout error:', error);
+      } finally {
+        setLoading(false);
+        // Reload page to refresh UI and remove protected elements
+        window.location.reload();
+      }
+    }, 1000);
   };
 
   const username =
@@ -76,7 +90,6 @@ export const Navbar = () => {
           <div className='items-center hidden gap-6 md:flex'>
             {navLinks.map((link) => {
               const isActive = location.pathname === link.path;
-
               return (
                 <motion.div
                   key={link.path}
@@ -95,7 +108,6 @@ export const Navbar = () => {
                   >
                     {link.name}
                   </Link>
-
                   <motion.span
                     variants={{
                       rest: { scaleX: 0, opacity: 0 },
