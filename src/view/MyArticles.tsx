@@ -45,7 +45,7 @@ export const MyArticles = () => {
   }, []);
 
   return (
-    <div className='px-4 mx-auto mt-32 h-[90vh] max-w-7xl sm:px-6 lg:px-8'>
+    <div className='h-auto max-w-6xl px-4 mx-auto mt-32 mb-10 sm:mb-20 sm:px-6 lg:px-8'>
       <h1 className='mb-6 text-xl font-bold text-gray-900 sm:text-2xl'>
         My Articles
       </h1>

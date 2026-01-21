@@ -4,10 +4,13 @@ import supabase from '../lib/supabaseClient';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Article } from '../types';
 import { Loading } from '../utils/Loading';
+import { useSnackbar } from 'notistack';
 
 export const EditArticle = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar(); // ✅ toast hook
+
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -16,6 +19,7 @@ export const EditArticle = () => {
 
     const fetchArticle = async () => {
       setLoading(true);
+
       const { data, error } = await supabase
         .from('articles')
         .select('*')
@@ -25,14 +29,14 @@ export const EditArticle = () => {
       setLoading(false);
 
       if (error) {
-        alert(error.message);
+        enqueueSnackbar(error.message, { variant: 'error' });
       } else {
         setArticle(data);
       }
     };
 
     fetchArticle();
-  }, [id]);
+  }, [id, enqueueSnackbar]);
 
   const handleSubmit = async (data: {
     title: string;
@@ -47,10 +51,12 @@ export const EditArticle = () => {
     const { error } = await supabase.from('articles').update(data).eq('id', id);
 
     if (error) {
+      enqueueSnackbar(error.message, { variant: 'error' });
       setLoading(false);
-      alert(error.message);
       return;
     }
+
+    enqueueSnackbar('Article updated successfully!', { variant: 'success' });
 
     setTimeout(() => {
       setLoading(false);
@@ -62,10 +68,10 @@ export const EditArticle = () => {
     <>
       {loading && <Loading message='Updating article…' />}
 
-      <div className='flex justify-center min-h-screen px-4 py-10 pt-32 sm:px-6 lg:px-8'>
+      <div className='flex justify-center min-h-screen px-4 py-10 pt-[6rem] sm:pt-[7rem] sm:px-6 lg:px-8'>
         <div className='w-full max-w-2xl'>
           {/* Go Back Button */}
-          <div className='mb-10'>
+          <div className='mb-8 sm:mb-10'>
             <button
               onClick={() => navigate('/')}
               className='flex items-center gap-2 text-sm font-medium text-gray-700 transition sm:text-base hover:text-blue-600'
@@ -106,7 +112,7 @@ export const EditArticle = () => {
                 <ArticleForm
                   initialData={article}
                   onSubmit={handleSubmit}
-                  onCancel={() => navigate('/')} // go back without saving
+                  onCancel={() => navigate('/')}
                 />
               ) : (
                 !loading && (
