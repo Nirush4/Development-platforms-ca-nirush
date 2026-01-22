@@ -3,6 +3,12 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      extend: {
+        fontFamily: {
+          serifDisplay: ['"Cormorant Garamond"', 'serif'],
+        },
+      },
+
       borderWidth: {
         3: '3px',
       },
