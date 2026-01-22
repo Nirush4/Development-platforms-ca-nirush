@@ -56,7 +56,6 @@ export const Home = () => {
       let error: unknown;
 
       if (query) {
-        // Search by title OR body
         const {
           data: searchData,
           error: searchError,
