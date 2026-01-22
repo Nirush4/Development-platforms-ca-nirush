@@ -1,19 +1,32 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import supabase from '../lib/supabaseClient';
 import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { Loading } from '../utils/Loading';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Search } from 'lucide-react';
 import { useSnackbar } from 'notistack';
+
+const DEBOUNCE_DELAY = 500; // 500ms debounce
 
 export const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+
   const location = useLocation();
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
+  // Reset search input when navigating away from Home
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setSearch('');
+    }
+  }, [location.pathname]);
+
+  // Fetch user on mount
   useEffect(() => {
     const fetchUser = async () => {
       const { data } = await supabase.auth.getUser();
@@ -32,23 +45,30 @@ export const Navbar = () => {
     };
   }, []);
 
-  // 🔥 Updated logout handler with page reload
+  // Debounced search navigation
+  useEffect(() => {
+    if (location.pathname !== '/') return; // ✅ only run on Home
+
+    const handler = setTimeout(() => {
+      navigate(`/?q=${encodeURIComponent(search)}&page=1`);
+    }, DEBOUNCE_DELAY);
+
+    return () => clearTimeout(handler);
+  }, [search, navigate, location.pathname]);
+
   const handleLogout = async () => {
     setLoading(true);
     setTimeout(async () => {
       try {
         await supabase.auth.signOut();
         localStorage.clear();
-        setIsOpen(false);
         enqueueSnackbar('Logged out successfully', { variant: 'info' });
-      } catch (error) {
+      } catch {
         enqueueSnackbar('Logout failed. Please try again.', {
           variant: 'error',
         });
-        console.error('Logout error:', error);
       } finally {
         setLoading(false);
-        // Reload page to refresh UI and remove protected elements
         window.location.reload();
       }
     }, 1000);
@@ -88,6 +108,20 @@ export const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className='items-center hidden gap-6 md:flex'>
+            {/* Search (desktop) */}
+            <div className='relative'>
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder='Search articles...'
+                className='w-56 py-1.5 pl-9 pr-3 text-sm rounded-full focus:outline-none'
+              />
+              <Search
+                size={16}
+                className='absolute text-gray-500 -translate-y-1/2 left-3 top-1/2'
+              />
+            </div>
+
             {navLinks.map((link) => {
               const isActive = location.pathname === link.path;
               return (
@@ -113,8 +147,8 @@ export const Navbar = () => {
                       rest: { scaleX: 0, opacity: 0 },
                       hover: { scaleX: 1, opacity: 1 },
                     }}
-                    transition={{ duration: 0.2, ease: 'easeInOut' }}
-                    className='absolute left-0 right-0 -bottom-1 h-[3px] bg-yellow-400 rounded-full origin-center'
+                    transition={{ duration: 0.2 }}
+                    className='absolute left-0 right-0 -bottom-1 h-[3px] bg-yellow-400 rounded-full'
                   />
                 </motion.div>
               );
@@ -123,14 +157,9 @@ export const Navbar = () => {
             {user ? (
               <>
                 <div className='flex items-center gap-2 pl-4 border-l border-red-400'>
-                  <img
-                    src={avatar}
-                    alt='avatar'
-                    className='object-cover w-8 h-8 rounded-full'
-                  />
+                  <img src={avatar} className='w-8 h-8 rounded-full' />
                   <span className='text-gray-100'>{username}</span>
                 </div>
-
                 <button
                   onClick={handleLogout}
                   className='px-4 py-2 text-sm bg-white rounded-lg'
@@ -165,7 +194,7 @@ export const Navbar = () => {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* MOBILE MENU */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -175,6 +204,20 @@ export const Navbar = () => {
               className='px-4 pb-4 md:hidden'
             >
               <div className='flex flex-col gap-4 pt-4 border-t border-red-500'>
+                {/* Search (mobile) */}
+                <div className='relative'>
+                  <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder='Search articles...'
+                    className='w-full py-2 pr-3 text-sm rounded-full pl-9'
+                  />
+                  <Search
+                    size={16}
+                    className='absolute text-gray-500 -translate-y-1/2 left-3 top-1/2'
+                  />
+                </div>
+
                 {navLinks.map((link) => (
                   <Link
                     key={link.path}
@@ -189,11 +232,7 @@ export const Navbar = () => {
                 {user ? (
                   <>
                     <div className='flex items-center gap-2 pt-2 border-t border-red-500'>
-                      <img
-                        src={avatar}
-                        className='w-8 h-8 rounded-full'
-                        alt='avatar'
-                      />
+                      <img src={avatar} className='w-8 h-8 rounded-full' />
                       <span className='text-gray-100'>{username}</span>
                     </div>
                     <button

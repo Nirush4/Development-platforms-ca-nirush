@@ -100,7 +100,7 @@ export const SingleArticle = () => {
   }
 
   return (
-    <div className='max-w-4xl px-4 mx-auto mb-10 mt-28 sm:mb-20 sm:px-6'>
+    <div className='max-w-4xl px-4 mx-auto mb-10 mt-[5.5rem] sm:mt-28 sm:mb-20 sm:px-6'>
       {/* Go Back */}
       <button
         onClick={() => navigate('/')}
