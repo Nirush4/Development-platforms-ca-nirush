@@ -156,7 +156,7 @@ export const Navbar = () => {
 
             {user ? (
               <>
-                <div className='flex items-center gap-2 pl-4 border-l border-red-400'>
+                <div className='flex items-center gap-2 pl-4 border-l-2 border-red-400'>
                   <img src={avatar} className='w-8 h-8 rounded-full' />
                   <span className='text-gray-100'>{username}</span>
                 </div>
