@@ -14,12 +14,19 @@ export const Home = () => {
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [searchInput, setSearchInput] = useState('');
+  const [sort, setSort] = useState<'asc' | 'desc'>('desc');
 
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get('page') ?? 1);
   const query = searchParams.get('q') ?? '';
+  const sortParam = (searchParams.get('sort') as 'asc' | 'desc') ?? 'desc';
+
+  // Sync sort state with URL
+  useEffect(() => {
+    setSort(sortParam);
+  }, [sortParam]);
 
   // Scroll to articles grid on page change
   useEffect(() => {
@@ -36,12 +43,12 @@ export const Home = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       if (searchInput !== query) {
-        setSearchParams({ page: '1', q: searchInput });
+        setSearchParams({ page: '1', q: searchInput, sort });
       }
     }, DEBOUNCE_DELAY);
 
     return () => clearTimeout(handler);
-  }, [searchInput, query, setSearchParams]);
+  }, [searchInput, query, sort, setSearchParams]);
 
   // Fetch articles from Supabase
   useEffect(() => {
@@ -51,47 +58,9 @@ export const Home = () => {
       const from = (page - 1) * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
-      let data: ArticleFromDB[] = [];
-      let count = 0;
-      let error: unknown;
-
-      if (query) {
-        const {
-          data: searchData,
-          error: searchError,
-          count: searchCount,
-        } = await supabase
-          .from('articles')
-          .select(
-            `
-              id,
-              title,
-              body,
-              category,
-              image_url,
-              created_at,
-              user_id,
-              profiles!inner (
-                username,
-                avatar_url
-              )
-            `,
-            { count: 'exact' }
-          )
-          .ilike('title', `%${query}%`)
-          .or(`body.ilike.%${query}%`)
-          .order('created_at', { ascending: false })
-          .range(from, to);
-
-        data = (searchData as unknown as ArticleFromDB[]) ?? [];
-        count = searchCount ?? data.length;
-        error = searchError;
-      } else {
-        const {
-          data: allData,
-          error: allError,
-          count: allCount,
-        } = await supabase
+      try {
+        // Base query
+        let baseQuery = supabase
           .from('articles')
           .select(
             `
@@ -109,38 +78,55 @@ export const Home = () => {
           `,
             { count: 'exact' }
           )
-          .order('created_at', { ascending: false })
+          .order('created_at', { ascending: sort === 'asc' })
           .range(from, to);
 
-        data = (allData as unknown as ArticleFromDB[]) ?? [];
-        count = allCount ?? data.length;
-        error = allError;
-      }
+        // Apply search if query exists
+        if (query) {
+          baseQuery = baseQuery.or(
+            `title.ilike.%${query}%,body.ilike.%${query}%`
+          );
+        }
 
-      if (!error) {
-        const mapped: Article[] = data.map((item) => ({
-          id: item.id,
-          title: item.title,
-          body: item.body,
-          category: item.category,
-          image_url: item.image_url || undefined,
-          created_at: item.created_at,
-          user_id: item.user_id,
-          username: item.profiles?.username ?? 'Unknown Author',
-          avatar_url:
-            item.profiles?.avatar_url ??
-            'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png',
-        }));
+        const { data, error, count } = await baseQuery;
+
+        if (error) throw error;
+
+        const mapped: Article[] = (data as unknown as ArticleFromDB[]).map(
+          (item) => ({
+            id: item.id,
+            title: item.title,
+            body: item.body,
+            category: item.category,
+            image_url: item.image_url || undefined,
+            created_at: item.created_at,
+            user_id: item.user_id,
+            username: item.profiles?.username ?? 'Unknown Author',
+            avatar_url:
+              item.profiles?.avatar_url ??
+              'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png',
+          })
+        );
 
         setArticles(mapped);
         setTotalPages(Math.ceil((count ?? mapped.length) / PAGE_SIZE));
+      } catch (err) {
+        console.error('Error fetching articles:', err);
+        setArticles([]);
+        setTotalPages(1);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     fetchArticles();
-  }, [page, query]);
+  }, [page, query, sort]);
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newSort = e.target.value as 'asc' | 'desc';
+    setSort(newSort);
+    setSearchParams({ page: '1', q: query, sort: newSort });
+  };
 
   if (loading) {
     return (
@@ -164,14 +150,13 @@ export const Home = () => {
   }
 
   const [featured, ...otherArticles] = articles;
-
-  // Top stories: random 4 articles from otherArticles
   const topStories = [...otherArticles]
     .sort(() => 0.5 - Math.random())
     .slice(0, 4);
 
   return (
     <div className='w-full mt-10 bg-gray-50'>
+      {/* Featured Section */}
       {!query && featured && (
         <section
           className='relative flex items-center justify-center w-full overflow-hidden text-white h-dvh'
@@ -182,11 +167,6 @@ export const Home = () => {
           }}
         >
           <div className='absolute inset-0 bg-black/50 backdrop-blur-sm'></div>
-
-          <div className='absolute top-0 left-0 w-full h-full pointer-events-none'>
-            <div className='absolute rounded-full w-72 h-72 bg-blue-600/20 -top-16 -left-16 animate-pulse-slow'></div>
-            <div className='absolute rounded-full w-96 h-96 bg-yellow-400/20 -bottom-24 -right-24 animate-pulse-slow'></div>
-          </div>
 
           <div className='relative z-10 flex flex-col items-center justify-center max-w-5xl px-4 text-center'>
             <span className='inline-block px-4 py-1 mb-4 text-xs font-semibold tracking-wider uppercase bg-blue-600 rounded-full sm:text-sm animate-bounce-slow'>
@@ -226,11 +206,44 @@ export const Home = () => {
           </div>
         </section>
       )}
+      {/* Sort Dropdown */}
+      <div className='flex items-center justify-end max-w-6xl px-4 mx-auto mt-8 mb-6 sm:mt-[5rem] sm:px-6 lg:px-8'>
+        <label className='mr-3 text-xs font-semibold tracking-wide text-gray-700 uppercase sm:text-sm'>
+          Sort by:
+        </label>
+        <div className='relative'>
+          <select
+            value={sort}
+            onChange={handleSortChange}
+            className='py-2 pl-4 pr-10 text-xs text-gray-700 transition duration-300 bg-white border border-gray-300 rounded-lg shadow-sm appearance-none cursor-pointer sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:shadow-md'
+          >
+            <option value='desc'>Newest First</option>
+            <option value='asc'>Oldest First</option>
+          </select>
+
+          {/* Custom arrow */}
+          <div className='absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none'>
+            <svg
+              className='w-4 h-4 text-gray-400'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth={2}
+              viewBox='0 0 24 24'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M19 9l-7 7-7-7'
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
 
       {/* MAIN GRID */}
       <section
         id='articles-grid'
-        className='relative z-10 px-4 mx-auto mt-[5rem] sm:mt-[9rem] max-w-6xl grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'
+        className='relative z-10 grid max-w-6xl grid-cols-1 gap-6 px-4 mx-auto mt-6 sm:mt-8 sm:grid-cols-2 lg:grid-cols-3'
       >
         {query
           ? articles.map((article) => (
@@ -244,7 +257,9 @@ export const Home = () => {
       <Pagination
         page={page}
         totalPages={totalPages}
-        onPageChange={(p) => setSearchParams({ page: String(p), q: query })}
+        onPageChange={(p) =>
+          setSearchParams({ page: String(p), q: query, sort })
+        }
       />
 
       {!query && topStories.length > 0 && (
