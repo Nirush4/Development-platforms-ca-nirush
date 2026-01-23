@@ -3,10 +3,12 @@ import { ArticleForm } from '../components/ArticleForm';
 import supabase from '../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { Loading } from '../utils/Loading';
+import { useSnackbar } from 'notistack';
 
 export const CreateArticle = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar(); // ✅ hook for toast
 
   const handleSubmit = async (data: {
     title: string;
@@ -16,42 +18,56 @@ export const CreateArticle = () => {
   }) => {
     setLoading(true);
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    if (!user) {
+      if (!user) {
+        enqueueSnackbar('You must be logged in to create an article.', {
+          variant: 'error',
+        });
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await supabase
+        .from('articles')
+        .insert([{ ...data, author_id: user.id }]);
+
+      if (error) {
+        enqueueSnackbar(error.message, { variant: 'error' });
+        setLoading(false);
+        return;
+      }
+
+      enqueueSnackbar('Article created successfully!', { variant: 'success' });
+
+      // Delay for smooth UX
+      setTimeout(() => {
+        setLoading(false);
+        navigate('/');
+      }, 1000);
+    } catch (err) {
+      console.error(err);
+      enqueueSnackbar('Something went wrong while creating the article.', {
+        variant: 'error',
+      });
       setLoading(false);
-      return alert('You must be logged in to create an article.');
     }
-
-    const { error } = await supabase
-      .from('articles')
-      .insert([{ ...data, author_id: user.id }]);
-
-    if (error) {
-      setLoading(false);
-      alert(error.message);
-      return;
-    }
-
-    setTimeout(() => {
-      setLoading(false);
-      navigate('/');
-    }, 1000);
   };
 
   return (
     <>
       {loading && <Loading message='Creating article…' />}
 
-      <div className='flex justify-center min-h-screen px-4 py-10 pt-32 sm:px-6 lg:px-8'>
+      <div className='flex justify-center min-h-screen px-4 py-10 pt-[6rem] sm:pt-[7rem] sm:px-6 lg:px-8'>
         <div className='w-full max-w-2xl'>
           {/* Go Back Button */}
-          <div className='mb-10'>
+          <div className='mb-8 sm:mb-10'>
             <button
               onClick={() => navigate('/')}
-              className='flex items-center gap-2 font-medium text-gray-700 transition hover:text-blue-600'
+              className='flex items-center gap-2 text-sm font-medium text-gray-700 transition sm:text-base hover:text-blue-600'
             >
               <svg
                 xmlns='http://www.w3.org/2000/svg'
@@ -85,7 +101,10 @@ export const CreateArticle = () => {
 
             {/* Form Content */}
             <div className='p-4 sm:p-6'>
-              <ArticleForm onSubmit={handleSubmit} />
+              <ArticleForm
+                onSubmit={handleSubmit}
+                onCancel={() => navigate('/')} // ✅ Cancel button
+              />
             </div>
           </div>
         </div>

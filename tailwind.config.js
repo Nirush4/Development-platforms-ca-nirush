@@ -1,18 +1,22 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      extend: {
+        fontFamily: {
+          serifDisplay: ['"Cormorant Garamond"', 'serif'],
+        },
+      },
+
       borderWidth: {
-        '3': '3px',
+        3: '3px',
       },
       animation: {
-        'flip': 'flip 0.6s ease-in-out',
-        'match': 'match 0.6s ease-in-out',
-        'confetti': 'confetti 0.5s ease-out',
+        flip: 'flip 0.6s ease-in-out',
+        match: 'match 0.6s ease-in-out',
+        confetti: 'confetti 0.5s ease-out',
+        pulse: 'pulse 1.8s ease-in-out infinite',
       },
       keyframes: {
         flip: {
@@ -26,10 +30,13 @@ export default {
         },
         confetti: {
           '0%': { transform: 'translateY(0) rotate(0deg)', opacity: '1' },
-          '100%': { transform: 'translateY(-100px) rotate(360deg)', opacity: '0' },
+          '100%': {
+            transform: 'translateY(-100px) rotate(360deg)',
+            opacity: '0',
+          },
         },
       },
     },
   },
   plugins: [],
-}
+};

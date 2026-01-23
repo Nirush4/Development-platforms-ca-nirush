@@ -5,6 +5,8 @@ import { User } from '@supabase/supabase-js';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Article } from '../types';
 import { Loading } from '../utils/Loading';
+import { showConfirmModal } from '../utils/confirmModal';
+import { useSnackbar } from 'notistack';
 
 interface Props {
   article: Article;
@@ -15,6 +17,7 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
   const [user, setUser] = useState<User | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
+  const { enqueueSnackbar } = useSnackbar(); // ✅ toast
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,7 +28,9 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
   }, []);
 
   const handleDelete = async () => {
-    const confirmed = confirm('Delete this article permanently?');
+    const confirmed = await showConfirmModal(
+      'Are you sure you want to delete this article?'
+    );
     if (!confirmed) return;
 
     setIsDeleting(true);
@@ -36,34 +41,36 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
       .delete()
       .eq('id', article.id);
 
-    // Smooth UX with a small delay
+    // Smooth UX delay
     setTimeout(() => {
       setShowLoader(false);
       setIsDeleting(false);
 
       if (error) {
-        alert(error.message);
+        enqueueSnackbar(error.message, { variant: 'error' });
       } else {
-        alert('Article deleted successfully');
+        enqueueSnackbar('Article deleted successfully', {
+          variant: 'success',
+        });
         onDelete?.(article.id);
       }
-    }, 800);
+    }, 1000);
   };
 
   return (
     <>
       {showLoader && <Loading message='Deleting article…' />}
 
-      <article className='flex flex-col overflow-hidden transition bg-white border shadow-sm rounded-xl hover:shadow-lg'>
+      <article className='flex flex-col overflow-hidden transition-all duration-300 bg-white shadow-md rounded-2xl hover:shadow-xl hover:-translate-y-1 group'>
         {/* Article Image */}
         {article.image_url && (
-          <div className='relative overflow-hidden h-52'>
+          <div className='relative h-56 overflow-hidden rounded-t-2xl'>
             <img
               src={article.image_url}
               alt={article.title}
-              className='object-cover w-full h-full transition-transform duration-300 hover:scale-105'
+              className='object-cover w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105'
             />
-            <span className='absolute px-3 py-1 text-xs font-semibold text-gray-800 rounded-full left-4 top-4 bg-white/90'>
+            <span className='absolute px-3 py-1 text-xs font-semibold text-gray-800 rounded-full shadow-sm left-4 top-4 bg-white/90'>
               {article.category}
             </span>
           </div>
@@ -71,41 +78,41 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
 
         {/* Content */}
         <div className='flex flex-col flex-1 p-6'>
-          <time className='mb-2 text-xs text-gray-400'>
+          <time className='mb-2 text-xs text-gray-400 sm:text-sm'>
             {new Date(article.created_at).toLocaleDateString('en-US', {
               year: 'numeric',
-              month: 'long',
+              month: 'short',
               day: 'numeric',
             })}
           </time>
-
-          <h2 className='mb-2 text-xl font-semibold text-gray-900 line-clamp-2'>
+          <Link
+            to={`/article/${article.id}`}
+            className='mb-3 text-lg font-bold text-gray-900 transition-colors line-clamp-2 group-hover:text-blue-600'
+          >
             {article.title}
-          </h2>
-
-          <div className='flex items-center gap-2 mb-4'>
+          </Link>
+          <div className='flex items-center gap-3 mb-3'>
             <img
               src={
                 article.avatar_url ||
                 'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png'
               }
               alt={article.username}
-              className='object-cover w-8 h-8 rounded-full'
+              className='object-cover rounded-full w-9 h-9 ring-1 ring-gray-200'
             />
-
             <span className='text-sm font-medium text-gray-700'>
               {article.username ?? 'User'}
             </span>
           </div>
 
-          <p className='mb-6 text-sm leading-relaxed text-gray-600 line-clamp-3'>
+          <p className='mb-3 text-sm leading-relaxed text-gray-600 line-clamp-3'>
             {article.body}
           </p>
 
           <div className='flex items-center justify-between mt-auto'>
             <Link
               to={`/article/${article.id}`}
-              className='text-sm font-medium text-blue-600 hover:text-blue-700'
+              className='text-sm font-semibold text-blue-600 transition-colors duration-300 hover:text-blue-800'
             >
               Read more →
             </Link>
@@ -114,7 +121,7 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
               <div className='flex items-center gap-2'>
                 <Link
                   to={`/articles/${article.id}/edit`}
-                  className='inline-flex items-center gap-1 px-2 py-1 text-sm text-gray-600 rounded-md hover:bg-gray-100 hover:text-gray-900'
+                  className='inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-gray-600 transition rounded-lg hover:bg-gray-100 hover:text-gray-900'
                 >
                   <Pencil size={16} />
                   Edit
@@ -123,7 +130,7 @@ export const ArticleCard = ({ article, onDelete }: Props) => {
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className='inline-flex items-center gap-1 px-2 py-1 text-sm text-red-600 rounded-md hover:bg-red-50 disabled:opacity-50'
+                  className='inline-flex items-center gap-1 px-3 py-1 text-sm font-medium text-red-600 transition rounded-lg hover:bg-red-50 disabled:opacity-50'
                 >
                   <Trash2 size={16} />
                   {isDeleting ? 'Deleting…' : 'Delete'}

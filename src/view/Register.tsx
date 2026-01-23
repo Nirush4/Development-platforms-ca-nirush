@@ -2,6 +2,7 @@ import { useState } from 'react';
 import supabase from '../lib/supabaseClient';
 import { useNavigate, Link } from 'react-router-dom';
 import { Loading } from '../utils/Loading';
+import { useSnackbar } from 'notistack'; // <-- import useSnackbar
 
 export const Register = () => {
   const [name, setName] = useState('');
@@ -12,6 +13,8 @@ export const Register = () => {
   const [showLoader, setShowLoader] = useState(false);
   const navigate = useNavigate();
 
+  const { enqueueSnackbar } = useSnackbar(); // <-- get enqueueSnackbar
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -21,14 +24,10 @@ export const Register = () => {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: {} }, // metadata optional
+        options: { data: {} },
       });
 
-      if (authError) {
-        alert(authError.message);
-        setLoading(false);
-        return;
-      }
+      if (authError) throw authError;
 
       const userId = authData.user?.id;
       if (!userId) throw new Error('No user ID returned from signup');
@@ -41,13 +40,12 @@ export const Register = () => {
 
       if (profileError) {
         console.error('Profile update error:', profileError);
-        alert('Failed to update profile info');
+        enqueueSnackbar('Failed to update profile info', { variant: 'error' });
       }
 
       // ✅ Show full-screen loader before navigation
       setShowLoader(true);
 
-      // Optional: Save user info in localStorage
       localStorage.setItem('username', name);
       localStorage.setItem(
         'avatar_url',
@@ -58,12 +56,17 @@ export const Register = () => {
       // Small delay for smooth animation
       setTimeout(() => {
         setShowLoader(false);
-        alert('Check your email to confirm your registration.');
-        navigate('/login');
+        enqueueSnackbar('Check your email to confirm your registration.', {
+          variant: 'success',
+        });
+        navigate('/');
       }, 1000);
     } catch (err) {
       console.error('Unexpected error during registration:', err);
-      alert('Something went wrong while creating your account.');
+      enqueueSnackbar((err as Error).message || 'Something went wrong', {
+        variant: 'error',
+      });
+    } finally {
       setLoading(false);
     }
   };
