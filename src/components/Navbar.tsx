@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Search } from 'lucide-react';
 import { useSnackbar } from 'notistack';
 
-const DEBOUNCE_DELAY = 500; // 500ms debounce
+const DEBOUNCE_DELAY = 500;
 
 export const Navbar = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -102,8 +102,12 @@ export const Navbar = () => {
       <nav className='fixed top-0 z-50 w-full px-4 bg-red-600 shadow-md sm:px-10'>
         <div className='flex items-center justify-between max-w-6xl py-4 mx-auto'>
           {/* Logo */}
-          <Link to='/' className='font-serif text-2xl font-bold text-gray-100'>
-            NewsHub
+          <Link to='/' className='flex items-center'>
+            <img
+              src='/logo.png'
+              alt='NewsHub Logo'
+              className='h-10 mr-2 w-29 sm:w-38 sm:h-15'
+            />
           </Link>
 
           {/* Desktop Navigation */}
