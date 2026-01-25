@@ -138,7 +138,7 @@ export const Home = () => {
 
   if (!articles.length) {
     return (
-      <p className='mt-40 text-xl text-center text-gray-500'>
+      <p className='mt-40 text-base text-center text-gray-500 sm:text-xl'>
         No articles found{' '}
         {query && (
           <>
