@@ -35,7 +35,7 @@ I chose **Option 2: Frontend with Supabase** to gain experience building a **ful
 
 ## 🚀 Live Project & Resources
 
-- **Live Demo: (NewsHub):** _(news-hubnet.netlify.app/)_
+- **Live Demo: (NewsHub):** _(https://news-hubnet.netlify.app/)_
 - **Project Planning (Kanban / GitHub Projects):** _(https://github.com/users/Nirush4/projects/15)_
 
 ---
