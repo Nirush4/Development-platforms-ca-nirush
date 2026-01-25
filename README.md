@@ -2,7 +2,8 @@
 
 ## Overview
 
-**NewsHub** is a full-stack news platform where where users can browse, submit, and manage their own news articles. Users have full CRUD (Create, Read, Update, Delete) capabilities over their articles.  
+**NewsHub** is a full-stack news platform where users can browse, submit, and manage their own news articles. Users have full CRUD (Create, Read, Update, Delete) capabilities over their articles.  
+
 This project demonstrates **modern frontend development practices**, user authentication, and cloud-based data management using **Supabase** as a Backend-as-a-Service (BaaS).
 
 This repository implements **Option 2: Frontend with Supabase**, built using **React, TypeScript, and Tailwind CSS**.
@@ -34,7 +35,7 @@ I chose **Option 2: Frontend with Supabase** to gain experience building a **ful
 
 ## 🚀 Live Project & Resources
 
-- **Live Demo:** _(news-hubnet.netlify.app/)_
+- **Live Demo: (NewsHub):** _(news-hubnet.netlify.app/)_
 - **Project Planning (Kanban / GitHub Projects):** _(https://github.com/users/Nirush4/projects/15)_
 
 ---
@@ -90,30 +91,50 @@ I chose **Option 2: Frontend with Supabase** to gain experience building a **ful
 
 ## 🗂️ Project Structure
 
-development-platforms-ca/
-│
-├─ public/
-│ ├─ \_redirects
-│ ├─ icon.png
-│ └─ logo.png
-│
-├─ src/
-│ ├─ components/ # Reusable UI components: Navbar, ArticleCard, ArticleForm, Footer, Pagination, Skeletons, etc.
-│ ├─ lib/ # Supabase client setup (supabaseClient.ts)
-│ ├─ types/ # TypeScript type definitions (index.ts)
-│ ├─ utils/ # Utility functions and components (confirmModal, Loading, ScrollToTop)
-│ ├─ view/ # Page views: Home, Login, Register, CreateArticle, EditArticle, SingleArticle, MyArticles
-│ ├─ App.tsx # Main App component
-│ └─ main.tsx # Entry point
-│
-├─ .env # Environment variables
-├─ index.html # HTML template
-├─ index.css # Global CSS styles (Tailwind imports)
-├─ package-lock.json
-├─ .eslintrc.cjs
-├─ .gitignore
-└─ LICENSE
-
+```text
+├── node_modules/
+├── public/
+│   ├── _redirects
+│   ├── icon.png
+│   └── logo.png
+├── src/
+│   ├── components/
+│   │   ├── ArticleCard.tsx
+│   │   ├── ArticleForm.tsx
+│   │   ├── cookieConsentView.ts
+│   │   ├── Footer.tsx
+│   │   ├── HomeSkeleton.tsx
+│   │   ├── Navbar.tsx
+│   │   ├── Pagination.tsx
+│   │   └── SingleArticleSkeleton.tsx
+│   ├── lib/
+│   │   └── supabaseClient.ts
+│   ├── types/
+│   │   └── index.ts
+│   ├── utils/
+│   │   ├── confirmModal.ts
+│   │   ├── Loading.tsx
+│   │   └── ScrollToTop.tsx
+│   ├── view/
+│   │   ├── CreateArticle.tsx
+│   │   ├── EditArticle.tsx
+│   │   ├── Home.tsx
+│   │   ├── Login.tsx
+│   │   ├── MyArticles.tsx
+│   │   ├── Register.tsx
+│   │   └── SingleArticle.tsx
+│   ├── App.tsx
+│   ├── index.css
+│   ├── main.tsx
+│   └── vite-env.d.ts
+├── .env
+├── .eslintrc.cjs
+├── .gitignore
+├── index.html
+├── LICENSE
+├── package-lock.json
+└── package.json
+```
 ---
 
 ## ⚙️ Getting Started
@@ -162,6 +183,6 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ## Author 👨‍💻​
 
-• Nirushan Rajamanoharan (@Nirush4)
+• Nirushan Rajamanoharan [@Nirush4](https://github.com/Nirush4)
 
 **Happy coding!**
