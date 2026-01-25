@@ -59,7 +59,7 @@ export const Register = () => {
         enqueueSnackbar('Check your email to confirm your registration.', {
           variant: 'success',
         });
-        navigate('/');
+        navigate('/login');
       }, 1000);
     } catch (err) {
       console.error('Unexpected error during registration:', err);
