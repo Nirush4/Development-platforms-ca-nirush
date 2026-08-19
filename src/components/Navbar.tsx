@@ -19,14 +19,12 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  // Reset search input when navigating away from Home
   useEffect(() => {
     if (location.pathname !== '/') {
       setSearch('');
     }
   }, [location.pathname]);
 
-  // Fetch user on mount
   useEffect(() => {
     const fetchUser = async () => {
       const { data } = await supabase.auth.getUser();
@@ -45,9 +43,8 @@ export const Navbar = () => {
     };
   }, []);
 
-  // Debounced search navigation
   useEffect(() => {
-    if (location.pathname !== '/') return; // ✅ only run on Home
+    if (location.pathname !== '/') return;
 
     const handler = setTimeout(() => {
       navigate(`/?q=${encodeURIComponent(search)}&page=1`);
@@ -101,7 +98,6 @@ export const Navbar = () => {
 
       <nav className='fixed top-0 z-50 w-full px-4 bg-red-600 shadow-md sm:px-10'>
         <div className='flex items-center justify-between max-w-6xl py-4 mx-auto'>
-          {/* Logo */}
           <Link to='/' className='flex items-center'>
             <img
               src='/logo.png'
@@ -110,9 +106,7 @@ export const Navbar = () => {
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className='items-center hidden gap-6 md:flex'>
-            {/* Search (desktop) */}
+          <div className='items-center hidden gap-6 lg:flex'>
             <div className='relative'>
               <input
                 value={search}
@@ -189,26 +183,23 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* Hamburger Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className='text-white md:hidden'
+            className='text-white lg:hidden'
           >
             {isOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
 
-        {/* MOBILE MENU */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className='px-4 pb-4 md:hidden'
+              className='px-4 pb-4 lg:hidden'
             >
               <div className='flex flex-col gap-4 pt-4 border-t border-red-500'>
-                {/* Search (mobile) */}
                 <div className='relative'>
                   <input
                     value={search}
