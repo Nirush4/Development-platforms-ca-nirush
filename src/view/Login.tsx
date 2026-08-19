@@ -2,7 +2,7 @@ import { useState } from 'react';
 import supabase from '../lib/supabaseClient';
 import { useNavigate, Link } from 'react-router-dom';
 import { Loading } from '../utils/Loading';
-import { useSnackbar } from 'notistack'; // <-- import useSnackbar
+import { useSnackbar } from 'notistack';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -11,7 +11,7 @@ export const Login = () => {
   const [showLoader, setShowLoader] = useState(false);
   const navigate = useNavigate();
 
-  const { enqueueSnackbar } = useSnackbar(); // <-- initialize snackbar
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,10 +29,8 @@ export const Login = () => {
         return;
       }
 
-      // Show full-screen loader before navigation
       setShowLoader(true);
 
-      // Fetch user profile to store username/avatar in localStorage
       if (data.user?.id) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -50,7 +48,6 @@ export const Login = () => {
         }
       }
 
-      // Small delay for smooth UX
       setTimeout(() => {
         setShowLoader(false);
         enqueueSnackbar('Logged in successfully!', { variant: 'success' });
