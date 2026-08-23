@@ -256,7 +256,7 @@ export const Register = () => {
             to='/login'
             className='font-medium text-blue-600 hover:text-blue-700 focus:outline-none focus:underline'
           >
-            Sign in
+            Log in
           </Link>
         </p>
       </form>
